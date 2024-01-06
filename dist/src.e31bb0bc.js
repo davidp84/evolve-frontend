@@ -13820,7 +13820,233 @@ class EditProfileView {
 var _default = new EditProfileView();
 
 exports.default = _default;
-},{"./../../App":"App.js","lit-html":"../node_modules/lit-html/lit-html.js","./../../Router":"Router.js","./../../Auth":"Auth.js","./../../Utils":"Utils.js","./../../UserAPI":"UserAPI.js","../../Toast":"Toast.js","moment":"../node_modules/moment/moment.js"}],"Router.js":[function(require,module,exports) {
+},{"./../../App":"App.js","lit-html":"../node_modules/lit-html/lit-html.js","./../../Router":"Router.js","./../../Auth":"Auth.js","./../../Utils":"Utils.js","./../../UserAPI":"UserAPI.js","../../Toast":"Toast.js","moment":"../node_modules/moment/moment.js"}],"views/pages/newProduct.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _App = _interopRequireDefault(require("../../App"));
+
+var _litHtml = require("lit-html");
+
+var _Router = require("../../Router");
+
+var _Auth = _interopRequireDefault(require("../../Auth"));
+
+var _Utils = _interopRequireDefault(require("../../Utils"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _templateObject() {
+  const data = _taggedTemplateLiteral(["\n      <va-app-header\n        title=\"Add New Product\"\n        user=\"", "\"\n      ></va-app-header>\n      <div class=\"page-content\">\n        <h1>New Product</h1>\n        <sl-form class=\"page-form\" @sl-submit=", ">\n          <div class=\"input-group\">\n            <sl-input\n              name=\"name\"\n              type=\"text\"\n              placeholder=\"Product Name\"\n              required\n            ></sl-input>\n          </div>\n          <div class=\"input-group\">\n            <sl-select placeholder=\"Category\" multiple clearable required>\n              <small>Type</small>\n              <sl-option value=\"individual\">Individual</sl-option>\n              <sl-option value=\"group\">Group</sl-option>\n              <sl-option value=\"couple\">Couples</sl-option>\n              <sl-option value=\"family\">Families</sl-option>\n              <sl-divider></sl-divider>\n              <small>Topic</small>\n              <sl-option value=\"counselling\">Counselling</sl-option>\n              <sl-option value=\"supervision\">Supervision</sl-option>\n              <sl-option value=\"training\">Training</sl-option>\n            </sl-select>\n          </div>\n          <div class=\"input-group\">\n            <sl-input name=\"price\" type=\"text\" placeholder=\"Price\" required>\n              <span slot=\"prefix\">$</span>\n            </sl-input>\n          </div>\n          <div class=\"input-group\">\n            <sl-textarea\n              name=\"description\"\n              rows=\"3\"\n              placeholder=\"Description\"\n            ></sl-textarea>\n          </div>\n          <div class=\"input-group\" style=\"margin-bottom: 2em;\">\n            <label>Image</label><br />\n            <input type=\"file\" name=\"image\" />\n          </div>\n          <div class=\"input-group\" style=\"margin-bottom: 2em;\">\n            <label>Length (in minutes)</label><br />\n            <sl-input name=\"length\" type=\"number\" required></sl-input>\n          </div>\n          <sl-button type=\"primary\" class=\"submit-btn\" submit\n            >Add Product</sl-button\n          >\n        </sl-form>\n      </div>\n    "]);
+
+  _templateObject = function _templateObject() {
+    return data;
+  };
+
+  return data;
+}
+
+function _taggedTemplateLiteral(strings, raw) { if (!raw) { raw = strings.slice(0); } return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
+
+class newProductView {
+  init() {
+    document.title = "New Product";
+    this.render();
+
+    _Utils.default.pageIntroAnim();
+  }
+
+  async newProductSubmitHandler(e) {
+    e.preventDefault();
+    const submitBtn = document.querySelector(".submit-btn");
+    submitBtn.setAttribute("loading", "");
+    const formData = e.detail.formData;
+
+    try {
+      await ProductAPI.newProduct(formData);
+      Toast.show("Product added!");
+      submitBtn.removeAttribute("loading"); // reset form
+      // reset text + textarea inputs
+
+      const textInputs = document.querySelectorAll("sl-input, sl-textarea");
+      if (textInputs) textInputs.forEach(textInput => textInput.value = null); // reset radio inputs
+
+      const radioInputs = document.querySelectorAll("sl-radio");
+      if (radioInputs) radioInputs.forEach(radioInput => radioInput.removeAttribute("checked")); // reset file input
+
+      const fileInput = document.querySelector("input[type=file]");
+      if (fileInput) fileInput.value = null;
+    } catch (err) {
+      Toast.show(err, "error");
+      submitBtn.removeAttribute("loading");
+    }
+  }
+
+  render() {
+    const template = (0, _litHtml.html)(_templateObject(), JSON.stringify(_Auth.default.currentUser), this.newProductSubmitHandler);
+    (0, _litHtml.render)(template, _App.default.rootEl);
+  }
+
+}
+
+var _default = new newProductView();
+
+exports.default = _default;
+},{"../../App":"App.js","lit-html":"../node_modules/lit-html/lit-html.js","../../Router":"Router.js","../../Auth":"Auth.js","../../Utils":"Utils.js"}],"views/pages/products.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _App = _interopRequireDefault(require("../../App"));
+
+var _litHtml = require("lit-html");
+
+var _Router = require("../../Router");
+
+var _Auth = _interopRequireDefault(require("../../Auth"));
+
+var _Utils = _interopRequireDefault(require("../../Utils"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _templateObject() {
+  const data = _taggedTemplateLiteral(["\n      <va-app-header\n        title=\"Profile\"\n        user=\"", "\"\n      ></va-app-header>\n      <div class=\"page-content\">\n        <h1>Page title</h1>\n        <p>Page content ...</p>\n      </div>\n    "]);
+
+  _templateObject = function _templateObject() {
+    return data;
+  };
+
+  return data;
+}
+
+function _taggedTemplateLiteral(strings, raw) { if (!raw) { raw = strings.slice(0); } return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
+
+class TemplateView {
+  init() {
+    document.title = "Template";
+    this.render();
+
+    _Utils.default.pageIntroAnim();
+  }
+
+  render() {
+    const template = (0, _litHtml.html)(_templateObject(), JSON.stringify(_Auth.default.currentUser));
+    (0, _litHtml.render)(template, _App.default.rootEl);
+  }
+
+}
+
+var _default = new TemplateView();
+
+exports.default = _default;
+},{"../../App":"App.js","lit-html":"../node_modules/lit-html/lit-html.js","../../Router":"Router.js","../../Auth":"Auth.js","../../Utils":"Utils.js"}],"views/pages/newBlogPost.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _App = _interopRequireDefault(require("../../App"));
+
+var _litHtml = require("lit-html");
+
+var _Router = require("../../Router");
+
+var _Auth = _interopRequireDefault(require("../../Auth"));
+
+var _Utils = _interopRequireDefault(require("../../Utils"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _templateObject() {
+  const data = _taggedTemplateLiteral(["\n      <va-app-header\n        title=\"Profile\"\n        user=\"", "\"\n      ></va-app-header>\n      <div class=\"page-content\">\n        <h1>Page title</h1>\n        <p>Page content ...</p>\n      </div>\n    "]);
+
+  _templateObject = function _templateObject() {
+    return data;
+  };
+
+  return data;
+}
+
+function _taggedTemplateLiteral(strings, raw) { if (!raw) { raw = strings.slice(0); } return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
+
+class TemplateView {
+  init() {
+    document.title = "Template";
+    this.render();
+
+    _Utils.default.pageIntroAnim();
+  }
+
+  render() {
+    const template = (0, _litHtml.html)(_templateObject(), JSON.stringify(_Auth.default.currentUser));
+    (0, _litHtml.render)(template, _App.default.rootEl);
+  }
+
+}
+
+var _default = new TemplateView();
+
+exports.default = _default;
+},{"../../App":"App.js","lit-html":"../node_modules/lit-html/lit-html.js","../../Router":"Router.js","../../Auth":"Auth.js","../../Utils":"Utils.js"}],"views/pages/blogPosts.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _App = _interopRequireDefault(require("../../App"));
+
+var _litHtml = require("lit-html");
+
+var _Router = require("../../Router");
+
+var _Auth = _interopRequireDefault(require("../../Auth"));
+
+var _Utils = _interopRequireDefault(require("../../Utils"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _templateObject() {
+  const data = _taggedTemplateLiteral(["\n      <va-app-header\n        title=\"Profile\"\n        user=\"", "\"\n      ></va-app-header>\n      <div class=\"page-content\">\n        <h1>Page title</h1>\n        <p>Page content ...</p>\n      </div>\n    "]);
+
+  _templateObject = function _templateObject() {
+    return data;
+  };
+
+  return data;
+}
+
+function _taggedTemplateLiteral(strings, raw) { if (!raw) { raw = strings.slice(0); } return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
+
+class TemplateView {
+  init() {
+    document.title = "Template";
+    this.render();
+
+    _Utils.default.pageIntroAnim();
+  }
+
+  render() {
+    const template = (0, _litHtml.html)(_templateObject(), JSON.stringify(_Auth.default.currentUser));
+    (0, _litHtml.render)(template, _App.default.rootEl);
+  }
+
+}
+
+var _default = new TemplateView();
+
+exports.default = _default;
+},{"../../App":"App.js","lit-html":"../node_modules/lit-html/lit-html.js","../../Router":"Router.js","../../Auth":"Auth.js","../../Utils":"Utils.js"}],"Router.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -13842,17 +14068,29 @@ var _profile = _interopRequireDefault(require("./views/pages/profile"));
 
 var _editProfile = _interopRequireDefault(require("./views/pages/editProfile"));
 
+var _newProduct = _interopRequireDefault(require("./views/pages/newProduct"));
+
+var _products = _interopRequireDefault(require("./views/pages/products"));
+
+var _newBlogPost = _interopRequireDefault(require("./views/pages/newBlogPost"));
+
+var _blogPosts = _interopRequireDefault(require("./views/pages/blogPosts"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // import views
 // define routes
 const routes = {
-  '/': _home.default,
-  '404': _.default,
-  '/signin': _signin.default,
-  '/signup': _signup.default,
-  '/profile': _profile.default,
-  '/editProfile': _editProfile.default
+  "/": _home.default,
+  404: _.default,
+  "/signin": _signin.default,
+  "/signup": _signup.default,
+  "/profile": _profile.default,
+  "/editProfile": _editProfile.default,
+  "/newProduct": _newProduct.default,
+  "/products": _products.default,
+  "/newBlogPost": _newBlogPost.default,
+  "/blogPosts": _blogPosts.default
 };
 
 class Router {
@@ -13864,14 +14102,14 @@ class Router {
     // initial call
     this.route(window.location.pathname); // on back/forward
 
-    window.addEventListener('popstate', () => {
+    window.addEventListener("popstate", () => {
       this.route(window.location.pathname);
     });
   }
 
   route(fullPathname) {
     // extract path without params
-    const pathname = fullPathname.split('?')[0];
+    const pathname = fullPathname.split("?")[0];
     const route = this.routes[pathname];
 
     if (route) {
@@ -13879,7 +14117,7 @@ class Router {
       this.routes[window.location.pathname].init();
     } else {
       // show 404 view instead
-      this.routes['404'].init();
+      this.routes["404"].init();
     }
   }
 
@@ -13903,10 +14141,10 @@ function gotoRoute(pathname) {
 
 function anchorRoute(e) {
   e.preventDefault();
-  const pathname = e.target.closest('a').pathname;
+  const pathname = e.target.closest("a").pathname;
   AppRouter.gotoRoute(pathname);
 }
-},{"./views/pages/home":"views/pages/home.js","./views/pages/404":"views/pages/404.js","./views/pages/signin":"views/pages/signin.js","./views/pages/signup":"views/pages/signup.js","./views/pages/profile":"views/pages/profile.js","./views/pages/editProfile":"views/pages/editProfile.js"}],"App.js":[function(require,module,exports) {
+},{"./views/pages/home":"views/pages/home.js","./views/pages/404":"views/pages/404.js","./views/pages/signin":"views/pages/signin.js","./views/pages/signup":"views/pages/signup.js","./views/pages/profile":"views/pages/profile.js","./views/pages/editProfile":"views/pages/editProfile.js","./views/pages/newProduct":"views/pages/newProduct.js","./views/pages/products":"views/pages/products.js","./views/pages/newBlogPost":"views/pages/newBlogPost.js","./views/pages/blogPosts":"views/pages/blogPosts.js"}],"App.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -13924,9 +14162,9 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 class App {
   constructor() {
-    this.name = "Haircuts";
+    this.name = "EvolveCounselling";
     this.version = "1.0.0";
-    this.apiBase = 'http://localhost:3000';
+    this.apiBase = "http://localhost:3000";
     this.rootEl = document.getElementById("root");
     this.version = "1.0.0";
   }
@@ -13934,7 +14172,7 @@ class App {
   init() {
     console.log("App.init"); // Toast init
 
-    _Toast.default.init(); // Authentication check    
+    _Toast.default.init(); // Authentication check
 
 
     _Auth.default.check(() => {
@@ -15712,7 +15950,7 @@ var _App = _interopRequireDefault(require("./../App"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _templateObject2() {
-  const data = _taggedTemplateLiteral(["\n          <h1 class=\"page-title\">", "</h1>\n        "]);
+  const data = _taggedTemplateLiteral([" <h1 class=\"page-title\">", "</h1> "]);
 
   _templateObject2 = function _templateObject2() {
     return data;
@@ -15722,7 +15960,7 @@ function _templateObject2() {
 }
 
 function _templateObject() {
-  const data = _taggedTemplateLiteral(["\n    <style>      \n      * {\n        box-sizing: border-box;\n      }\n      .app-header {\n        background: var(--brand-color);\n        position: fixed;\n        top: 0;\n        right: 0;\n        left: 0;\n        height: var(--app-header-height);\n        color: #fff;\n        display: flex;\n        z-index: 9;\n        box-shadow: 4px 0px 10px rgba(0,0,0,0.2);\n        align-items: center;\n      }\n      \n\n      .app-header-main {\n        flex-grow: 1;\n        display: flex;\n        align-items: center;\n      }\n\n      .app-header-main::slotted(h1){\n        color: #fff;\n      }\n\n      .app-logo a {\n        color: #fff;\n        text-decoration: none;\n        font-weight: bold;\n        font-size: 1.2em;\n        padding: .6em;\n        display: inline-block;        \n      }\n\n      .app-logo img {\n        width: 90px;\n      }\n      \n      .hamburger-btn::part(base) {\n        color: #fff;\n      }\n\n      .app-top-nav {\n        display: flex;\n        height: 100%;\n        align-items: center;\n      }\n\n      .app-top-nav a {\n        display: inline-block;\n        padding: .8em;\n        text-decoration: none;\n        color: #fff;\n      }\n      \n      .app-side-menu-items a {\n        display: block;\n        padding: .5em;\n        text-decoration: none;\n        font-size: 1.3em;\n        color: #333;\n      }\n\n      .app-side-menu-logo {\n        width: 120px;\n        margin-bottom: 1em;\n        position: absolute;\n        top: 2em;\n        left: 1.5em;\n      }\n\n      .page-title {\n        color: var(--app-header-txt-color);\n        margin-right: 0.5em;\n        font-size: var(--app-header-title-font-size);\n      }\n\n      /* active nav links */\n      .app-top-nav a.active,\n      .app-side-menu-items a.active {\n        font-weight: bold;\n      }\n\n      /* RESPONSIVE - MOBILE ------------------- */\n      @media all and (max-width: 768px){       \n        \n        .app-top-nav {\n          display: none;\n        }\n      }\n\n    </style>\n\n    <header class=\"app-header\">\n      <sl-icon-button class=\"hamburger-btn\" name=\"list\" @click=\"", "\" style=\"font-size: 1.5em;\"></sl-icon-button>       \n      \n      <div class=\"app-header-main\">\n        ", "\n        <slot></slot>\n      </div>\n\n      <nav class=\"app-top-nav\">\n        <a href=\"/\" @click=\"", "\">Home</a>        \n        <sl-dropdown>\n          <a slot=\"trigger\" href=\"#\" @click=\"", "\">\n            <sl-avatar style=\"--size: 24px;\" image=", "></sl-avatar> ", "\n          </a>\n          <sl-menu>            \n            <sl-menu-item @click=\"", "\">Profile</sl-menu-item>\n            <sl-menu-item @click=\"", "\">Edit Profile</sl-menu-item>\n            <sl-menu-item @click=\"", "\">Sign Out</sl-menu-item>\n          </sl-menu>\n        </sl-dropdown>\n      </nav>\n    </header>\n\n    <sl-drawer class=\"app-side-menu\" placement=\"left\">\n      <img class=\"app-side-menu-logo\" src=\"/images/logo.svg\">\n      <nav class=\"app-side-menu-items\">\n        <a href=\"/\" @click=\"", "\">Home</a>\n        <a href=\"/profile\" @click=\"", "\">Profile</a>\n        <a href=\"#\" @click=\"", "\">Sign Out</a>\n      </nav>  \n    </sl-drawer>\n    "]);
+  const data = _taggedTemplateLiteral(["\n        <style>\n          * {\n            box-sizing: border-box;\n          }\n          .app-header {\n            background: var(--brand-color);\n            position: fixed;\n            top: 0;\n            right: 0;\n            left: 0;\n            height: var(--app-header-height);\n            color: #fff;\n            display: flex;\n            z-index: 9;\n            box-shadow: 4px 0px 10px rgba(0, 0, 0, 0.2);\n            align-items: center;\n          }\n\n          .app-header-main {\n            flex-grow: 1;\n            display: flex;\n            align-items: center;\n          }\n\n          .app-header-main::slotted(h1) {\n            color: #fff;\n          }\n\n          .app-logo a {\n            color: #fff;\n            text-decoration: none;\n            font-weight: bold;\n            font-size: 1.2em;\n            padding: 0.6em;\n            display: inline-block;\n          }\n\n          .app-logo img {\n            width: 90px;\n          }\n\n          .hamburger-btn::part(base) {\n            color: #fff;\n          }\n\n          .app-top-nav {\n            display: flex;\n            height: 100%;\n            align-items: center;\n          }\n\n          .app-top-nav a {\n            display: inline-block;\n            padding: 0.8em;\n            text-decoration: none;\n            color: #fff;\n          }\n\n          .app-side-menu-items a {\n            display: block;\n            padding: 0.5em;\n            text-decoration: none;\n            font-size: 1.3em;\n            color: #333;\n          }\n\n          .app-side-menu-logo {\n            width: 120px;\n            margin-bottom: 1em;\n            position: absolute;\n            top: 2em;\n            left: 1.5em;\n          }\n\n          .page-title {\n            color: var(--app-header-txt-color);\n            margin-right: 0.5em;\n            font-size: var(--app-header-title-font-size);\n          }\n\n          /* active nav links */\n          .app-top-nav a.active,\n          .app-side-menu-items a.active {\n            font-weight: bold;\n          }\n\n          /* RESPONSIVE - MOBILE ------------------- */\n          @media all and (max-width: 768px) {\n            .app-top-nav {\n              display: none;\n            }\n          }\n        </style>\n\n        <header class=\"app-header\">\n          <sl-icon-button\n            class=\"hamburger-btn\"\n            name=\"list\"\n            @click=\"", "\"\n            style=\"font-size: 1.5em;\"\n          ></sl-icon-button>\n\n          <div class=\"app-header-main\">\n            ", "\n            <slot></slot>\n          </div>\n\n          <nav class=\"app-top-nav\">\n            <a href=\"/\" @click=\"", "\">Home</a>\n            <sl-dropdown>\n              <a slot=\"trigger\" href=\"#\" @click=\"", "\">\n                <sl-avatar\n                  style=\"--size: 24px;\"\n                  image=", "\n                ></sl-avatar>\n                ", "\n              </a>\n              <sl-menu>\n                <sl-menu-item @click=\"", "\"\n                  >Profile</sl-menu-item\n                >\n                <sl-menu-item @click=\"", "\"\n                  >Edit Profile</sl-menu-item\n                >\n                <sl-menu-item @click=\"", "\"\n                  >Sign Out</sl-menu-item\n                >\n              </sl-menu>\n            </sl-dropdown>\n          </nav>\n        </header>\n\n        <sl-drawer class=\"app-side-menu\" placement=\"left\">\n          <img class=\"app-side-menu-logo\" src=\"/images/logo.svg\" />\n          <nav class=\"app-side-menu-items\">\n            <a href=\"/\" @click=\"", "\">Home</a>\n            <a href=\"/profile\" @click=\"", "\">Profile</a>\n            <a href=\"/products\" @click=\"", "\">View Products</a>\n            <a href=\"/newProduct\" @click=\"", "\">Add New Product</a>\n            <a href=\"/blogPosts\" @click=\"", "\">View Blog Posts</a>\n            <a href=\"/newBlogPost\" @click=\"", "\"\n              >Add New Blog Post</a\n            >\n            <a href=\"#\" @click=\"", "\">Sign Out</a>\n          </nav>\n        </sl-drawer>\n      "]);
 
   _templateObject = function _templateObject() {
     return data;
@@ -15733,7 +15971,7 @@ function _templateObject() {
 
 function _taggedTemplateLiteral(strings, raw) { if (!raw) { raw = strings.slice(0); } return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
 
-customElements.define('va-app-header', class AppHeader extends _litElement.LitElement {
+customElements.define("va-app-header", class AppHeader extends _litElement.LitElement {
   constructor() {
     super();
   }
@@ -15756,35 +15994,35 @@ customElements.define('va-app-header', class AppHeader extends _litElement.LitEl
 
   navActiveLinks() {
     const currentPath = window.location.pathname;
-    const navLinks = this.shadowRoot.querySelectorAll('.app-top-nav a, .app-side-menu-items a');
+    const navLinks = this.shadowRoot.querySelectorAll(".app-top-nav a, .app-side-menu-items a");
     navLinks.forEach(navLink => {
-      if (navLink.href.slice(-1) == '#') return;
+      if (navLink.href.slice(-1) == "#") return;
 
       if (navLink.pathname === currentPath) {
-        navLink.classList.add('active');
+        navLink.classList.add("active");
       }
     });
   }
 
   hamburgerClick() {
-    const appMenu = this.shadowRoot.querySelector('.app-side-menu');
+    const appMenu = this.shadowRoot.querySelector(".app-side-menu");
     appMenu.show();
   }
 
   menuClick(e) {
     e.preventDefault();
-    const pathname = e.target.closest('a').pathname;
-    const appSideMenu = this.shadowRoot.querySelector('.app-side-menu'); // hide appMenu
+    const pathname = e.target.closest("a").pathname;
+    const appSideMenu = this.shadowRoot.querySelector(".app-side-menu"); // hide appMenu
 
     appSideMenu.hide();
-    appSideMenu.addEventListener('sl-after-hide', () => {
+    appSideMenu.addEventListener("sl-after-hide", () => {
       // goto route after menu is hidden
       (0, _Router.gotoRoute)(pathname);
     });
   }
 
   render() {
-    return (0, _litElement.html)(_templateObject(), this.hamburgerClick, this.title ? (0, _litElement.html)(_templateObject2(), this.title) : "", _Router.anchorRoute, e => e.preventDefault(), this.user && this.user.avatar ? "".concat(_App.default.apiBase, "/images/").concat(this.user.avatar) : '', this.user && this.user.firstName, () => (0, _Router.gotoRoute)('/profile'), () => (0, _Router.gotoRoute)('/editProfile'), () => _Auth.default.signOut(), this.menuClick, this.menuClick, () => _Auth.default.signOut());
+    return (0, _litElement.html)(_templateObject(), this.hamburgerClick, this.title ? (0, _litElement.html)(_templateObject2(), this.title) : "", _Router.anchorRoute, e => e.preventDefault(), this.user && this.user.avatar ? "".concat(_App.default.apiBase, "/images/").concat(this.user.avatar) : "", this.user && this.user.firstName, () => (0, _Router.gotoRoute)("/profile"), () => (0, _Router.gotoRoute)("/editProfile"), () => _Auth.default.signOut(), this.menuClick, this.menuClick, this.menuClick, this.menuClick, this.menuClick, this.menuClick, () => _Auth.default.signOut());
   }
 
 });
@@ -15905,7 +16143,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "60807" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49530" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
