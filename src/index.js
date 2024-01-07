@@ -1,12 +1,13 @@
-import App from './App.js'
+import App from "./App.js";
 
 // components (custom web components)
-import './components/va-app-header'
+import "./components/va-app-header";
+import "./components/va-product";
 
 // styles
-import './scss/master.scss'
+import "./scss/master.scss";
 
 // app.init
-document.addEventListener('DOMContentLoaded', () => {
-  App.init()
-})
+document.addEventListener("DOMContentLoaded", () => {
+  App.init();
+});

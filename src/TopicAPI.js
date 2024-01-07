@@ -2,10 +2,11 @@ import App from "./App";
 import Auth from "./Auth";
 import Toast from "./Toast";
 
-class ProductAPI {
-  async newProduct(formData) {
+class TopicAPI {
+  async newTopic(formData) {
     // send fetch request
-    const response = await fetch(`${App.apiBase}/product`, {
+    console.log("API", formData);
+    const response = await fetch(`${App.apiBase}/topic`, {
       method: "POST",
       headers: { Authorization: `Bearer ${localStorage.accessToken}` },
       body: formData,
@@ -13,7 +14,7 @@ class ProductAPI {
 
     // if response not ok
     if (!response.ok) {
-      let message = "Problem adding product";
+      let message = "Problem adding topic";
       if (response.status == 400) {
         const err = await response.json();
         message = err.message;
@@ -29,19 +30,19 @@ class ProductAPI {
     return data;
   }
 
-  async getProducts() {
+  async getTopics() {
     // fetch the json data
-    const response = await fetch(`${App.apiBase}/product`, {
+    const response = await fetch(`${App.apiBase}/topic`, {
       headers: { Authorization: `Bearer ${localStorage.accessToken}` },
     });
-    // console.log(response.json());
+
     // if response not ok
     if (!response.ok) {
       // console log error
       const err = await response.json();
       if (err) console.log(err);
       // throw error (exit this function)
-      throw new Error("Problem getting products");
+      throw new Error("Problem getting topics");
     }
 
     // convert response payload into json - store as data
@@ -52,4 +53,4 @@ class ProductAPI {
   }
 }
 
-export default new ProductAPI();
+export default new TopicAPI();

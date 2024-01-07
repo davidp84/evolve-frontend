@@ -3,15 +3,44 @@ import { html, render } from "lit-html";
 import { gotoRoute, anchorRoute } from "../../Router";
 import Auth from "../../Auth";
 import Utils from "../../Utils";
+import Toast from "../../Toast";
+import ProductAPI from "../../ProductAPI";
+import TypeAPI from "../../TypeAPI";
+import TopicAPI from "../../TopicAPI";
 
 class newProductView {
   init() {
     document.title = "New Product";
+    this.types = null;
+    this.topics = null;
     this.render();
     Utils.pageIntroAnim();
+    this.getTypes();
+    this.getTopics();
+  }
+
+  async getTypes() {
+    try {
+      this.types = await TypeAPI.getTypes();
+      // console.log(this.types);
+      this.render();
+    } catch (err) {
+      Toast.show(err, "error");
+    }
+  }
+
+  async getTopics() {
+    try {
+      this.topics = await TopicAPI.getTopics();
+      // console.log(this.topics);
+      this.render();
+    } catch (err) {
+      Toast.show(err, "error");
+    }
   }
 
   async newProductSubmitHandler(e) {
+    console.log(e.detail.formData);
     e.preventDefault();
     const submitBtn = document.querySelector(".submit-btn");
     submitBtn.setAttribute("loading", "");
@@ -61,20 +90,41 @@ class newProductView {
               required
             ></sl-input>
           </div>
-          <div class="input-group">
-            <sl-select placeholder="Category" multiple clearable required>
-              <small>Type</small>
-              <sl-option value="individual">Individual</sl-option>
-              <sl-option value="group">Group</sl-option>
-              <sl-option value="couple">Couples</sl-option>
-              <sl-option value="family">Families</sl-option>
-              <sl-divider></sl-divider>
-              <small>Topic</small>
-              <sl-option value="counselling">Counselling</sl-option>
-              <sl-option value="supervision">Supervision</sl-option>
-              <sl-option value="training">Training</sl-option>
-            </sl-select>
+
+          <div class="input-group" style="margin-bottom: 2em;">
+            <label>Type</label><br />
+            <sl-radio-group label="Select type" value="type">
+              ${this.types == null
+                ? html` <sl-spinner></sl-spinner> `
+                : html`
+                    ${this.types.map(
+                      (type) => html`
+                        <sl-radio name="type" value="${type._id}"
+                          >${type.name}</sl-radio
+                        >
+                      `
+                    )}
+                  `}
+            </sl-radio-group>
           </div>
+
+          <div class="input-group" style="margin-bottom: 2em;">
+            <label>Topic</label><br />
+            <sl-radio-group label="Select topic" value="topic">
+              ${this.topics == null
+                ? html` <sl-spinner></sl-spinner> `
+                : html`
+                    ${this.topics.map(
+                      (topic) => html`
+                        <sl-radio name="topic" value="${topic._id}"
+                          >${topic.name}</sl-radio
+                        >
+                      `
+                    )}
+                  `}
+            </sl-radio-group>
+          </div>
+
           <div class="input-group">
             <sl-input name="price" type="text" placeholder="Price" required>
               <span slot="prefix">$</span>
@@ -92,8 +142,12 @@ class newProductView {
             <input type="file" name="image" />
           </div>
           <div class="input-group" style="margin-bottom: 2em;">
-            <label>Length (in minutes)</label><br />
-            <sl-input name="length" type="number" required></sl-input>
+            <sl-input
+              name="length"
+              placeholder="Length (in minutes)"
+              type="number"
+              required
+            ></sl-input>
           </div>
           <sl-button type="primary" class="submit-btn" submit
             >Add Product</sl-button
