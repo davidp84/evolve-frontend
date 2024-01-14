@@ -14309,7 +14309,80 @@ class ProductView {
 var _default = new ProductView();
 
 exports.default = _default;
-},{"../../App":"App.js","lit-html":"../node_modules/lit-html/lit-html.js","../../Router":"Router.js","../../Auth":"Auth.js","../../Utils":"Utils.js","../../Toast":"Toast.js","../../ProductAPI":"ProductAPI.js"}],"views/pages/newBlogPost.js":[function(require,module,exports) {
+},{"../../App":"App.js","lit-html":"../node_modules/lit-html/lit-html.js","../../Router":"Router.js","../../Auth":"Auth.js","../../Utils":"Utils.js","../../Toast":"Toast.js","../../ProductAPI":"ProductAPI.js"}],"BlogPostAPI.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _App = _interopRequireDefault(require("./App"));
+
+var _Auth = _interopRequireDefault(require("./Auth"));
+
+var _Toast = _interopRequireDefault(require("./Toast"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+class BlogPostAPI {
+  async newBlogPost(formData) {
+    // send fetch request
+    const response = await fetch("".concat(_App.default.apiBase, "/blogPost"), {
+      method: "POST",
+      headers: {
+        Authorization: "Bearer ".concat(localStorage.accessToken)
+      },
+      body: formData
+    }); // if response not ok
+
+    if (!response.ok) {
+      let message = "Problem adding blog post";
+
+      if (response.status == 400) {
+        const err = await response.json();
+        message = err.message;
+      } // throw error (exit this function)
+
+
+      throw new Error(message);
+    } // convert response payload into json - store as data
+
+
+    const data = await response.json(); // return data
+
+    return data;
+  }
+
+  async getBlogPosts() {
+    // fetch the json data
+    const response = await fetch("".concat(_App.default.apiBase, "/blogPost"), {
+      headers: {
+        Authorization: "Bearer ".concat(localStorage.accessToken)
+      }
+    }); // console.log(response.json());
+    // if response not ok
+
+    if (!response.ok) {
+      // console log error
+      const err = await response.json();
+      if (err) console.log(err); // throw error (exit this function)
+
+      throw new Error("Problem getting blog posts");
+    } // convert response payload into json - store as data
+
+
+    const data = await response.json(); // return data
+
+    return data;
+  }
+
+}
+
+var _default = new BlogPostAPI();
+
+exports.default = _default;
+},{"./App":"App.js","./Auth":"Auth.js","./Toast":"Toast.js"}],"views/pages/newBlogPost.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -14327,10 +14400,14 @@ var _Auth = _interopRequireDefault(require("../../Auth"));
 
 var _Utils = _interopRequireDefault(require("../../Utils"));
 
+var _Toast = _interopRequireDefault(require("../../Toast"));
+
+var _BlogPostAPI = _interopRequireDefault(require("../../BlogPostAPI"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _templateObject() {
-  const data = _taggedTemplateLiteral(["\n      <va-app-header\n        title=\"Profile\"\n        user=\"", "\"\n      ></va-app-header>\n      <div class=\"page-content\">\n        <h1>Page title</h1>\n        <p>Page content ...</p>\n      </div>\n    "]);
+  const data = _taggedTemplateLiteral(["\n      <va-app-header\n        title=\"Add New Blog Post\"\n        user=\"", "\"\n      ></va-app-header>\n      <div class=\"page-content\">\n        <h1>New Blog Post</h1>\n        <sl-form class=\"page-form\" @sl-submit=", ">\n          <div class=\"input-group\">\n            <sl-input\n              name=\"title\"\n              type=\"text\"\n              placeholder=\"Blog Post Title\"\n              required\n            ></sl-input>\n          </div>\n          <div class=\"input-group\">\n            <sl-textarea\n              name=\"description\"\n              rows=\"3\"\n              placeholder=\"Description\"\n            ></sl-textarea>\n          </div>\n          <div class=\"input-group\">\n            <sl-textarea\n              name=\"content\"\n              placeholder=\"Post\"\n              rows=\"10\"\n              resize=\"auto\"\n              required\n            >\n            </sl-textarea>\n          </div>\n          <div class=\"input-group\" style=\"margin-bottom: 2em;\">\n            <sl-input\n              name=\"tags\"\n              placeholder=\"Tags (comma separated)\"\n              type=\"text\"\n              required\n            ></sl-input>\n          </div>\n          <div class=\"input-group\" style=\"margin-bottom: 2em;\">\n            <label>Image</label><br />\n            <input type=\"file\" name=\"image\" />\n          </div>\n\n          <sl-button type=\"primary\" class=\"submit-btn\" submit\n            >Add Post</sl-button\n          >\n        </sl-form>\n      </div>\n    "]);
 
   _templateObject = function _templateObject() {
     return data;
@@ -14341,25 +14418,55 @@ function _templateObject() {
 
 function _taggedTemplateLiteral(strings, raw) { if (!raw) { raw = strings.slice(0); } return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
 
-class TemplateView {
+class newBlogPostView {
   init() {
-    document.title = "Template";
+    document.title = "New Blog Post";
     this.render();
 
     _Utils.default.pageIntroAnim();
   }
 
+  async newBlogPostSubmitHandler(e) {
+    console.log(e.detail.formData);
+    e.preventDefault();
+    const submitBtn = document.querySelector(".submit-btn");
+    submitBtn.setAttribute("loading", "");
+    const formData = e.detail.formData;
+
+    try {
+      await _BlogPostAPI.default.newBlogPost(formData);
+
+      _Toast.default.show("Blog Post added!");
+
+      submitBtn.removeAttribute("loading"); // reset form
+      // reset text + textarea inputs
+
+      const textInputs = document.querySelectorAll("sl-input, sl-textarea");
+      if (textInputs) textInputs.forEach(textInput => textInput.value = null); // reset radio inputs
+
+      const radioInputs = document.querySelectorAll("sl-radio");
+      if (radioInputs) radioInputs.forEach(radioInput => radioInput.removeAttribute("checked")); // reset file input
+
+      const fileInput = document.querySelector("input[type=file]");
+      if (fileInput) fileInput.value = null;
+    } catch (err) {
+      _Toast.default.show(err, "error");
+
+      submitBtn.removeAttribute("loading");
+    }
+  }
+
   render() {
-    const template = (0, _litHtml.html)(_templateObject(), JSON.stringify(_Auth.default.currentUser));
+    const template = (0, _litHtml.html)(_templateObject(), JSON.stringify(_Auth.default.currentUser), this.newBlogPostSubmitHandler);
     (0, _litHtml.render)(template, _App.default.rootEl);
   }
 
 }
 
-var _default = new TemplateView();
+var _default = new newBlogPostView();
 
 exports.default = _default;
-},{"../../App":"App.js","lit-html":"../node_modules/lit-html/lit-html.js","../../Router":"Router.js","../../Auth":"Auth.js","../../Utils":"Utils.js"}],"views/pages/blogPosts.js":[function(require,module,exports) {
+},{"../../App":"App.js","lit-html":"../node_modules/lit-html/lit-html.js","../../Router":"Router.js","../../Auth":"Auth.js","../../Utils":"Utils.js","../../Toast":"Toast.js","../../BlogPostAPI":"BlogPostAPI.js"}],"views/pages/blogPosts.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -14377,10 +14484,44 @@ var _Auth = _interopRequireDefault(require("../../Auth"));
 
 var _Utils = _interopRequireDefault(require("../../Utils"));
 
+var _Toast = _interopRequireDefault(require("../../Toast"));
+
+var _BlogPostAPI = _interopRequireDefault(require("../../BlogPostAPI"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+function _templateObject4() {
+  const data = _taggedTemplateLiteral(["\n                    <va-blog-post\n                      class=\"blogPost-card\"\n                      id=\"", "\"\n                      title=\"", "\"\n                      description=\"", "\"\n                      content=\"", "\"\n                      tags=\"", "\"\n                      image=\"", "\"\n                    ></va-blog-post>\n                  "]);
+
+  _templateObject4 = function _templateObject4() {
+    return data;
+  };
+
+  return data;
+}
+
+function _templateObject3() {
+  const data = _taggedTemplateLiteral(["\n                ", "\n              "]);
+
+  _templateObject3 = function _templateObject3() {
+    return data;
+  };
+
+  return data;
+}
+
+function _templateObject2() {
+  const data = _taggedTemplateLiteral(["<sl-spinner></sl-spinner>"]);
+
+  _templateObject2 = function _templateObject2() {
+    return data;
+  };
+
+  return data;
+}
+
 function _templateObject() {
-  const data = _taggedTemplateLiteral(["\n      <va-app-header\n        title=\"Profile\"\n        user=\"", "\"\n      ></va-app-header>\n      <div class=\"page-content\">\n        <h1>Page title</h1>\n        <p>Page content ...</p>\n      </div>\n    "]);
+  const data = _taggedTemplateLiteral(["\n      <va-app-header\n        title=\"BlogPosts\"\n        user=\"", "\"\n      ></va-app-header>\n      <div class=\"page-content\">\n        <div class=\"products-grid\">\n          ", "\n        </div>\n      </div>\n    "]);
 
   _templateObject = function _templateObject() {
     return data;
@@ -14391,25 +14532,38 @@ function _templateObject() {
 
 function _taggedTemplateLiteral(strings, raw) { if (!raw) { raw = strings.slice(0); } return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
 
-class TemplateView {
+class BlogPostView {
   init() {
-    document.title = "Template";
+    document.title = "Blog Posts";
+    this.blogPosts = null;
     this.render();
 
     _Utils.default.pageIntroAnim();
+
+    this.getBlogPosts();
+  }
+
+  async getBlogPosts() {
+    try {
+      this.blogPosts = await _BlogPostAPI.default.getBlogPosts();
+      console.log("BlogPosts = ", this.blogPosts);
+      this.render();
+    } catch (err) {
+      _Toast.default.show(err, "error");
+    }
   }
 
   render() {
-    const template = (0, _litHtml.html)(_templateObject(), JSON.stringify(_Auth.default.currentUser));
+    const template = (0, _litHtml.html)(_templateObject(), JSON.stringify(_Auth.default.currentUser), this.blogPosts == null ? (0, _litHtml.html)(_templateObject2()) : (0, _litHtml.html)(_templateObject3(), this.blogPosts.map(post => (0, _litHtml.html)(_templateObject4(), post._id, post.title, post.description, post.content, post.tags, post.image))));
     (0, _litHtml.render)(template, _App.default.rootEl);
   }
 
 }
 
-var _default = new TemplateView();
+var _default = new BlogPostView();
 
 exports.default = _default;
-},{"../../App":"App.js","lit-html":"../node_modules/lit-html/lit-html.js","../../Router":"Router.js","../../Auth":"Auth.js","../../Utils":"Utils.js"}],"Router.js":[function(require,module,exports) {
+},{"../../App":"App.js","lit-html":"../node_modules/lit-html/lit-html.js","../../Router":"Router.js","../../Auth":"Auth.js","../../Utils":"Utils.js","../../Toast":"Toast.js","../../BlogPostAPI":"BlogPostAPI.js"}],"Router.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -16470,7 +16624,7 @@ customElements.define("va-product", class Product extends _litElement.LitElement
     // creates sl-dialog element
     const dialogEl = document.createElement("sl-dialog"); // Adds class name
 
-    dialogEl.className = "haircut-dialog"; // creates sl-dialog content
+    dialogEl.className = "product-dialog"; // creates sl-dialog content
 
     const dialogContent = (0, _litElement.html)(_templateObject(), _App.default.apiBase, this.image, this.name, this.name, this.description, this.price, this.length, this.addFavHandler.bind(this));
     (0, _litHtml.render)(dialogContent, dialogEl); // appends to document.body
@@ -16494,6 +16648,108 @@ customElements.define("va-product", class Product extends _litElement.LitElement
 
   render() {
     return (0, _litElement.html)(_templateObject2(), _App.default.apiBase, this.image, this.name, this.price, this.moreInfoHandler.bind(this));
+  }
+
+});
+},{"@polymer/lit-element":"../node_modules/@polymer/lit-element/lit-element.js","lit-html":"../node_modules/lit-html/lit-html.js","../Router":"Router.js","../Auth":"Auth.js","../App":"App.js","../Toast":"Toast.js"}],"components/va-blog-post.js":[function(require,module,exports) {
+"use strict";
+
+var _litElement = require("@polymer/lit-element");
+
+var _litHtml = require("lit-html");
+
+var _Router = require("../Router");
+
+var _Auth = _interopRequireDefault(require("../Auth"));
+
+var _App = _interopRequireDefault(require("../App"));
+
+var _Toast = _interopRequireDefault(require("../Toast"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _templateObject2() {
+  const data = _taggedTemplateLiteral(["\n        <style>\n          .author {\n            font-size: 0.9em;\n            font-style: italic;\n            opacitity: 0.8;\n          }\n        </style>\n\n        <sl-card>\n          <img slot=\"image\" src=\"", "/images/", "\" />\n          <p class=\"tags\">Tags: <span>", "</span></p>\n          <h2>", "</h2>\n          <h3>", "</h3>\n\n          <sl-button @click=", "\n            >View Post</sl-button\n          >\n        </sl-card>\n      "]);
+
+  _templateObject2 = function _templateObject2() {
+    return data;
+  };
+
+  return data;
+}
+
+function _templateObject() {
+  const data = _taggedTemplateLiteral(["<style>\n          .wrap {\n            display: flex;\n          }\n          .image {\n            width: 50%;\n          }\n          .image img {\n            width: 100%;\n          }\n          .body {\n            padding-left: 1em;\n          }\n        </style>\n        <div class=\"wrap\">\n          <div class=\"image\">\n            <img src=\"", "/images/", "\" alt=\"", "\" />\n          </div>\n          <div class=\"body\">\n            <h1>", "</h1>\n            <p>", "</p>\n            <p class=\"content\">", "</p>\n            <p class=\"tags\">Tags: <span>", "</span></p>\n\n            <sl-button @click=", ">\n              <sl-icon slot=\"prefix\" name=\"heart-fill\"></sl-icon>\n              Add to Favourites\n            </sl-button>\n          </div>\n        </div>"]);
+
+  _templateObject = function _templateObject() {
+    return data;
+  };
+
+  return data;
+}
+
+function _taggedTemplateLiteral(strings, raw) { if (!raw) { raw = strings.slice(0); } return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
+
+customElements.define("va-blog-post", class BlogPost extends _litElement.LitElement {
+  constructor() {
+    super();
+  }
+
+  static get properties() {
+    return {
+      id: {
+        id: String
+      },
+      title: {
+        type: String
+      },
+      description: {
+        type: String
+      },
+      content: {
+        type: String
+      },
+      tags: {
+        type: String
+      },
+      image: {
+        type: String
+      }
+    };
+  }
+
+  firstUpdated() {
+    super.firstUpdated();
+  }
+
+  moreInfoHandler() {
+    // creates sl-dialog element
+    const dialogEl = document.createElement("sl-dialog"); // Adds class name
+
+    dialogEl.className = "blogPost-dialog"; // creates sl-dialog content
+
+    const dialogContent = (0, _litElement.html)(_templateObject(), _App.default.apiBase, this.image, this.name, this.title, this.description, this.content, this.tags, this.addFavHandler.bind(this));
+    (0, _litHtml.render)(dialogContent, dialogEl); // appends to document.body
+
+    document.body.append(dialogEl); //shows sl-dialog
+
+    dialogEl.show(); // on hide delete dialogEl
+
+    dialogEl.addEventListener("sl-after-hide", () => {
+      dialogEl.remove();
+    });
+  } // async addFavHandler() {
+  //   try {
+  //     await UserAPI.addFavHaircut(this.id);
+  //     Toast.show("Haircut added to favourites");
+  //   } catch (err) {
+  //     Toast.show(err, "error");
+  //   }
+  // }
+
+
+  render() {
+    return (0, _litElement.html)(_templateObject2(), _App.default.apiBase, this.image, this.tags, this.title, this.description, this.moreInfoHandler.bind(this));
   }
 
 });
@@ -16578,6 +16834,8 @@ require("./components/va-app-header");
 
 require("./components/va-product");
 
+require("./components/va-blog-post");
+
 require("./scss/master.scss");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -16588,7 +16846,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 document.addEventListener("DOMContentLoaded", () => {
   _App.default.init();
 });
-},{"./App.js":"App.js","./components/va-app-header":"components/va-app-header.js","./components/va-product":"components/va-product.js","./scss/master.scss":"scss/master.scss"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"./App.js":"App.js","./components/va-app-header":"components/va-app-header.js","./components/va-product":"components/va-product.js","./components/va-blog-post":"components/va-blog-post.js","./scss/master.scss":"scss/master.scss"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -16616,7 +16874,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51836" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "60403" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

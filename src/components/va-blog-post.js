@@ -7,8 +7,8 @@ import App from "../App";
 import Toast from "../Toast";
 
 customElements.define(
-  "va-product",
-  class Product extends LitElement {
+  "va-blog-post",
+  class BlogPost extends LitElement {
     constructor() {
       super();
     }
@@ -18,25 +18,19 @@ customElements.define(
         id: {
           id: String,
         },
-        name: {
+        title: {
           type: String,
         },
         description: {
           type: String,
         },
-        price: {
+        content: {
+          type: String,
+        },
+        tags: {
           type: String,
         },
         image: {
-          type: String,
-        },
-        type: {
-          type: String,
-        },
-        topic: {
-          type: String,
-        },
-        length: {
           type: String,
         },
       };
@@ -50,7 +44,7 @@ customElements.define(
       // creates sl-dialog element
       const dialogEl = document.createElement("sl-dialog");
       // Adds class name
-      dialogEl.className = "product-dialog";
+      dialogEl.className = "blogPost-dialog";
 
       // creates sl-dialog content
       const dialogContent = html`<style>
@@ -63,27 +57,19 @@ customElements.define(
           .image img {
             width: 100%;
           }
-          .content {
+          .body {
             padding-left: 1em;
-          }
-          .length span {
-            text-transform: uppercase;
-            font-weight: bold;
-          }
-          .price {
-            font-size: 1.5em;
-            color: var(--brand-color);
           }
         </style>
         <div class="wrap">
           <div class="image">
             <img src="${App.apiBase}/images/${this.image}" alt="${this.name}" />
           </div>
-          <div class="content">
-            <h1>${this.name}</h1>
+          <div class="body">
+            <h1>${this.title}</h1>
             <p>${this.description}</p>
-            <p class="price">$${this.price}</p>
-            <p class="length">Length: <span>${this.length}</span></p>
+            <p class="content">${this.content}</p>
+            <p class="tags">Tags: <span>${this.tags}</span></p>
 
             <sl-button @click=${this.addFavHandler.bind(this)}>
               <sl-icon slot="prefix" name="heart-fill"></sl-icon>
@@ -127,10 +113,12 @@ customElements.define(
 
         <sl-card>
           <img slot="image" src="${App.apiBase}/images/${this.image}" />
-          <h2>${this.name}</h2>
-          <h3>$${this.price}</h3>
+          <p class="tags">Tags: <span>${this.tags}</span></p>
+          <h2>${this.title}</h2>
+          <h3>${this.description}</h3>
+
           <sl-button @click=${this.moreInfoHandler.bind(this)}
-            >More Info</sl-button
+            >View Post</sl-button
           >
         </sl-card>
       `;
