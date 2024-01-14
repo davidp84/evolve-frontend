@@ -70,11 +70,6 @@ customElements.define(
             <p>${this.description}</p>
             <p class="content">${this.content}</p>
             <p class="tags">Tags: <span>${this.tags}</span></p>
-
-            <sl-button @click=${this.addFavHandler.bind(this)}>
-              <sl-icon slot="prefix" name="heart-fill"></sl-icon>
-              Add to Favourites
-            </sl-button>
           </div>
         </div>`;
 

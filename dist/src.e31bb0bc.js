@@ -16679,7 +16679,7 @@ function _templateObject2() {
 }
 
 function _templateObject() {
-  const data = _taggedTemplateLiteral(["<style>\n          .wrap {\n            display: flex;\n          }\n          .image {\n            width: 50%;\n          }\n          .image img {\n            width: 100%;\n          }\n          .body {\n            padding-left: 1em;\n          }\n        </style>\n        <div class=\"wrap\">\n          <div class=\"image\">\n            <img src=\"", "/images/", "\" alt=\"", "\" />\n          </div>\n          <div class=\"body\">\n            <h1>", "</h1>\n            <p>", "</p>\n            <p class=\"content\">", "</p>\n            <p class=\"tags\">Tags: <span>", "</span></p>\n\n            <sl-button @click=", ">\n              <sl-icon slot=\"prefix\" name=\"heart-fill\"></sl-icon>\n              Add to Favourites\n            </sl-button>\n          </div>\n        </div>"]);
+  const data = _taggedTemplateLiteral(["<style>\n          .wrap {\n            display: flex;\n          }\n          .image {\n            width: 50%;\n          }\n          .image img {\n            width: 100%;\n          }\n          .body {\n            padding-left: 1em;\n          }\n        </style>\n        <div class=\"wrap\">\n          <div class=\"image\">\n            <img src=\"", "/images/", "\" alt=\"", "\" />\n          </div>\n          <div class=\"body\">\n            <h1>", "</h1>\n            <p>", "</p>\n            <p class=\"content\">", "</p>\n            <p class=\"tags\">Tags: <span>", "</span></p>\n          </div>\n        </div>"]);
 
   _templateObject = function _templateObject() {
     return data;
@@ -16728,7 +16728,7 @@ customElements.define("va-blog-post", class BlogPost extends _litElement.LitElem
 
     dialogEl.className = "blogPost-dialog"; // creates sl-dialog content
 
-    const dialogContent = (0, _litElement.html)(_templateObject(), _App.default.apiBase, this.image, this.name, this.title, this.description, this.content, this.tags, this.addFavHandler.bind(this));
+    const dialogContent = (0, _litElement.html)(_templateObject(), _App.default.apiBase, this.image, this.name, this.title, this.description, this.content, this.tags);
     (0, _litHtml.render)(dialogContent, dialogEl); // appends to document.body
 
     document.body.append(dialogEl); //shows sl-dialog
