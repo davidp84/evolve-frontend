@@ -6,7 +6,8 @@ class App {
   constructor() {
     this.name = "EvolveCounselling";
     this.version = "1.0.0";
-    this.apiBase = "http://localhost:3000";
+    // this.apiBase = "http://localhost:3000";
+    this.apiBase = "https://dpulvirenti-evolve-backend-60724c2bf286.herokuapp.com/";
     this.rootEl = document.getElementById("root");
     this.version = "1.0.0";
   }
