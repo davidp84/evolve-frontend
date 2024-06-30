@@ -81,6 +81,7 @@ class newBlogPostView {
       ></va-app-header>
       <div class="page-content">
         <h1>New Blog Post</h1>
+        <h2>YOU MUST ENTER TAGS LAST</h2>
         <sl-form class="page-form" enctype="multipart/form-data" @sl-submit=${this.newBlogPostSubmitHandler}>
           <div class="input-group">
             <sl-input
