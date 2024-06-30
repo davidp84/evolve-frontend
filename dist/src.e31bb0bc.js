@@ -14377,6 +14377,31 @@ class BlogPostAPI {
     return data;
   }
 
+  async getBlogPostForm() {
+    // Return html for tinymce editor
+    const response = await fetch("".concat(_App.default.apiBase, "/blogPost/editor"), {
+      headers: {
+        Authorization: "Bearer ".concat(localStorage.accessToken)
+      }
+    }); // console.log(response);
+    // console.log(response.json());
+    // if response not ok
+
+    if (!response.ok) {
+      // console log error
+      const err = await response.json();
+      if (err) console.log(err); // throw error (exit this function)
+
+      throw new Error("Problem getting blog post form");
+    } // convert response payload into json - store as data
+
+
+    const data = await response.json(); // console.log(data);
+    // return data
+
+    return data;
+  }
+
 }
 
 var _default = new BlogPostAPI();
@@ -14407,7 +14432,7 @@ var _BlogPostAPI = _interopRequireDefault(require("../../BlogPostAPI"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _templateObject() {
-  const data = _taggedTemplateLiteral(["\n      <va-app-header\n        title=\"Add New Blog Post\"\n        user=\"", "\"\n      ></va-app-header>\n      <div class=\"page-content\">\n        <h1>New Blog Post</h1>\n        <sl-form class=\"page-form\" @sl-submit=", ">\n          <div class=\"input-group\">\n            <sl-input\n              name=\"title\"\n              type=\"text\"\n              placeholder=\"Blog Post Title\"\n              required\n            ></sl-input>\n          </div>\n          <div class=\"input-group\">\n            <sl-textarea\n              name=\"description\"\n              rows=\"3\"\n              placeholder=\"Description\"\n            ></sl-textarea>\n          </div>\n          <div class=\"input-group\">\n            <sl-textarea\n              name=\"content\"\n              placeholder=\"Post\"\n              rows=\"10\"\n              resize=\"auto\"\n              required\n            >\n            </sl-textarea>\n          </div>\n          <div class=\"input-group\" style=\"margin-bottom: 2em;\">\n            <sl-input\n              name=\"tags\"\n              placeholder=\"Tags (comma separated)\"\n              type=\"text\"\n              required\n            ></sl-input>\n          </div>\n          <div class=\"input-group\" style=\"margin-bottom: 2em;\">\n            <label>Image</label><br />\n            <input type=\"file\" name=\"image\" />\n          </div>\n\n          <sl-button type=\"primary\" class=\"submit-btn\" submit\n            >Add Post</sl-button\n          >\n        </sl-form>\n      </div>\n    "]);
+  const data = _taggedTemplateLiteral(["\n      <va-app-header\n        title=\"Add New Blog Post\"\n        user=\"", "\"\n      ></va-app-header>\n      <div class=\"page-content\">\n        <h1>New Blog Post</h1>\n        <sl-form class=\"page-form\" enctype=\"multipart/form-data\" @sl-submit=", ">\n          <div class=\"input-group\">\n            <sl-input\n              name=\"title\"\n              type=\"text\"\n              placeholder=\"Blog Post Title\"\n              required\n            ></sl-input>\n          </div>\n          <div class=\"input-group\">\n            <sl-textarea\n              name=\"description\"\n              rows=\"3\"\n              placeholder=\"Description\"\n            ></sl-textarea>\n          </div>\n\n          <div class=\"input-group\" id=\"blogPostArea\">\n          \n          </div>\n          <div class=\"input-group\" style=\"margin-bottom: 2em;\">\n            <sl-input\n              @sl-change=", "\n              name=\"tags\"\n              placeholder=\"Tags (comma separated)\"\n              type=\"text\"\n              required\n            ></sl-input>\n          </div>\n          <div class=\"input-group\" style=\"margin-bottom: 2em;\">\n            <label>Image</label><br />\n            <input type=\"file\" name=\"image\" />\n          </div>\n\n          <div class=\"input-group\" hidden>\n            <sl-textarea\n              name=\"content\"\n              id=\"content\"\n              placeholder=\"Post\"\n              rows=\"10\"\n              resize=\"auto\"\n            >\n            </sl-textarea>\n          </div>\n\n          <sl-button type=\"primary\" class=\"submit-btn\" submit\n            >Add Post</sl-button\n          >\n        </sl-form>\n      </div>\n    "]);
 
   _templateObject = function _templateObject() {
     return data;
@@ -14419,15 +14444,34 @@ function _templateObject() {
 function _taggedTemplateLiteral(strings, raw) { if (!raw) { raw = strings.slice(0); } return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
 
 class newBlogPostView {
-  init() {
+  async init() {
     document.title = "New Blog Post";
     this.render();
+    this.setBlogPostArea();
 
     _Utils.default.pageIntroAnim();
   }
 
+  async getBlogForm() {
+    try {
+      return await _BlogPostAPI.default.getBlogPostForm();
+    } catch (err) {
+      _Toast.default.show(err, "error");
+    }
+  }
+
+  async setBlogPostArea() {
+    var el = document.getElementById("blogPostArea");
+    el.innerHTML = await this.getBlogForm();
+  }
+
+  handleTextArea() {
+    var tinyMCE = document.getElementById('tinyMCE-textarea').value;
+    var content = document.getElementById('content');
+    content.value = tinyMCE;
+  }
+
   async newBlogPostSubmitHandler(e) {
-    console.log(e.detail.formData);
     e.preventDefault();
     const submitBtn = document.querySelector(".submit-btn");
     submitBtn.setAttribute("loading", "");
@@ -14442,7 +14486,10 @@ class newBlogPostView {
       // reset text + textarea inputs
 
       const textInputs = document.querySelectorAll("sl-input, sl-textarea");
-      if (textInputs) textInputs.forEach(textInput => textInput.value = null); // reset radio inputs
+      if (textInputs) textInputs.forEach(textInput => textInput.value = null); // reset tinyMCE blog content inputs
+
+      const blogContents = document.querySelectorAll("tinymce-editor");
+      if (blogContents) blogContents.forEach(blogContent => blogContent.value = ""); // reset radio inputs
 
       const radioInputs = document.querySelectorAll("sl-radio");
       if (radioInputs) radioInputs.forEach(radioInput => radioInput.removeAttribute("checked")); // reset file input
@@ -14457,7 +14504,7 @@ class newBlogPostView {
   }
 
   render() {
-    const template = (0, _litHtml.html)(_templateObject(), JSON.stringify(_Auth.default.currentUser), this.newBlogPostSubmitHandler);
+    const template = (0, _litHtml.html)(_templateObject(), JSON.stringify(_Auth.default.currentUser), this.newBlogPostSubmitHandler, this.handleTextArea);
     (0, _litHtml.render)(template, _App.default.rootEl);
   }
 
@@ -16679,7 +16726,7 @@ function _templateObject2() {
 }
 
 function _templateObject() {
-  const data = _taggedTemplateLiteral(["<style>\n          .wrap {\n            display: flex;\n          }\n          .image {\n            width: 50%;\n          }\n          .image img {\n            width: 100%;\n          }\n          .body {\n            padding-left: 1em;\n          }\n        </style>\n        <div class=\"wrap\">\n          <div class=\"image\">\n            <img src=\"", "/images/", "\" alt=\"", "\" />\n          </div>\n          <div class=\"body\">\n            <h1>", "</h1>\n            <p>", "</p>\n            <p class=\"content\">", "</p>\n            <p class=\"tags\">Tags: <span>", "</span></p>\n          </div>\n        </div>"]);
+  const data = _taggedTemplateLiteral(["<style>\n          .wrap {\n            display: flex;\n          }\n          .image {\n            width: 50%;\n          }\n          .image img {\n            width: 100%;\n          }\n          .body {\n            padding-left: 1em;\n          }\n        </style>\n        <div class=\"wrap\">\n          <div class=\"image\">\n            <img src=\"", "/images/", "\" alt=\"", "\" />\n          </div>\n          <div class=\"body\">\n            <h1>", "</h1>\n            <p>", "</p>\n            <p class=\"content\" id=\"blogContent\"></p>\n            <p class=\"tags\">Tags: <span>", "</span></p>\n          </div>\n        </div>"]);
 
   _templateObject = function _templateObject() {
     return data;
@@ -16728,10 +16775,12 @@ customElements.define("va-blog-post", class BlogPost extends _litElement.LitElem
 
     dialogEl.className = "blogPost-dialog"; // creates sl-dialog content
 
-    const dialogContent = (0, _litElement.html)(_templateObject(), _App.default.apiBase, this.image, this.name, this.title, this.description, this.content, this.tags);
+    const dialogContent = (0, _litElement.html)(_templateObject(), _App.default.apiBase, this.image, this.name, this.title, this.description, this.tags);
     (0, _litHtml.render)(dialogContent, dialogEl); // appends to document.body
 
-    document.body.append(dialogEl); //shows sl-dialog
+    document.body.append(dialogEl);
+    var blogContent = document.getElementById("blogContent");
+    blogContent.innerHTML = this.content; //shows sl-dialog
 
     dialogEl.show(); // on hide delete dialogEl
 
@@ -16874,7 +16923,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "60403" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "60706" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

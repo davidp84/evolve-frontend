@@ -145,12 +145,16 @@ a {
 }
 
 .page-form {
-  max-width: 700px;
+  max-width: 875px;
 }
 
 sl-dialog::part(title) {
   font-weight: 500;
   font-size: 1.6em;
+}
+
+.blogPost-dialog {
+  --width: 50%;
 }
 
 @media all and (max-width: 768px) {

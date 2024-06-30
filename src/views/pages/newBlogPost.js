@@ -7,15 +7,36 @@ import Toast from "../../Toast";
 import BlogPostAPI from "../../BlogPostAPI";
 
 class newBlogPostView {
-  init() {
+  async init() {
     document.title = "New Blog Post";
     this.render();
+    this.setBlogPostArea();
     Utils.pageIntroAnim();
   }
 
+  async getBlogForm() {
+    try {
+      return await BlogPostAPI.getBlogPostForm();
+    } catch (err) {
+      Toast.show(err, "error");
+    }
+  }
+
+  async setBlogPostArea() {
+    var el = document.getElementById("blogPostArea");
+    el.innerHTML = await this.getBlogForm();
+  }
+
+  handleTextArea() {
+    var tinyMCE = document.getElementById('tinyMCE-textarea').value;
+    var content = document.getElementById('content');
+    content.value = tinyMCE;
+  }
+
   async newBlogPostSubmitHandler(e) {
-    console.log(e.detail.formData);
+    
     e.preventDefault();
+    
     const submitBtn = document.querySelector(".submit-btn");
     submitBtn.setAttribute("loading", "");
     const formData = e.detail.formData;
@@ -30,6 +51,11 @@ class newBlogPostView {
       const textInputs = document.querySelectorAll("sl-input, sl-textarea");
       if (textInputs)
         textInputs.forEach((textInput) => (textInput.value = null));
+
+      // reset tinyMCE blog content inputs
+      const blogContents = document.querySelectorAll("tinymce-editor");
+      if (blogContents)
+        blogContents.forEach((blogContent) => (blogContent.value = ""));
 
       // reset radio inputs
       const radioInputs = document.querySelectorAll("sl-radio");
@@ -55,7 +81,7 @@ class newBlogPostView {
       ></va-app-header>
       <div class="page-content">
         <h1>New Blog Post</h1>
-        <sl-form class="page-form" @sl-submit=${this.newBlogPostSubmitHandler}>
+        <sl-form class="page-form" enctype="multipart/form-data" @sl-submit=${this.newBlogPostSubmitHandler}>
           <div class="input-group">
             <sl-input
               name="title"
@@ -71,18 +97,13 @@ class newBlogPostView {
               placeholder="Description"
             ></sl-textarea>
           </div>
-          <div class="input-group">
-            <sl-textarea
-              name="content"
-              placeholder="Post"
-              rows="10"
-              resize="auto"
-              required
-            >
-            </sl-textarea>
+
+          <div class="input-group" id="blogPostArea">
+          
           </div>
           <div class="input-group" style="margin-bottom: 2em;">
             <sl-input
+              @sl-change=${this.handleTextArea}
               name="tags"
               placeholder="Tags (comma separated)"
               type="text"
@@ -92,6 +113,17 @@ class newBlogPostView {
           <div class="input-group" style="margin-bottom: 2em;">
             <label>Image</label><br />
             <input type="file" name="image" />
+          </div>
+
+          <div class="input-group" hidden>
+            <sl-textarea
+              name="content"
+              id="content"
+              placeholder="Post"
+              rows="10"
+              resize="auto"
+            >
+            </sl-textarea>
           </div>
 
           <sl-button type="primary" class="submit-btn" submit

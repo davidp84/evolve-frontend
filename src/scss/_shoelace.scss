@@ -6,6 +6,9 @@ sl-dialog::part(title){
   font-size: 1.6em;
 }
 
+.blogPost-dialog {
+  --width: 50%;
+}
 
 // RESPONSIVE - MOBILE -------------------
 @media all and (max-width: 768px){ 

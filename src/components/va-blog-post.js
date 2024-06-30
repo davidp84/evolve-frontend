@@ -68,7 +68,7 @@ customElements.define(
           <div class="body">
             <h1>${this.title}</h1>
             <p>${this.description}</p>
-            <p class="content">${this.content}</p>
+            <p class="content" id="blogContent"></p>
             <p class="tags">Tags: <span>${this.tags}</span></p>
           </div>
         </div>`;
@@ -78,8 +78,13 @@ customElements.define(
       // appends to document.body
       document.body.append(dialogEl);
 
+
+      var blogContent = document.getElementById("blogContent");
+      blogContent.innerHTML = this.content;
+      
       //shows sl-dialog
       dialogEl.show();
+
 
       // on hide delete dialogEl
       dialogEl.addEventListener("sl-after-hide", () => {

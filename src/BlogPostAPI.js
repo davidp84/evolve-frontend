@@ -50,6 +50,32 @@ class BlogPostAPI {
     // return data
     return data;
   }
+
+  async getBlogPostForm() {
+    // Return html for tinymce editor
+    const response = await fetch(`${App.apiBase}/blogPost/editor`, {
+      headers: { Authorization: `Bearer ${localStorage.accessToken}` },
+    });
+    // console.log(response);
+    // console.log(response.json());
+    // if response not ok
+    if (!response.ok) {
+      // console log error
+      const err = await response.json();
+      if (err) console.log(err);
+      // throw error (exit this function)
+      throw new Error("Problem getting blog post form");
+    }
+
+    // convert response payload into json - store as data
+    
+    const data = await response.json();
+    // console.log(data);
+    // return data
+    return data;
+  }
 }
+
+
 
 export default new BlogPostAPI();
