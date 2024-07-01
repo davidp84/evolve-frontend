@@ -106,14 +106,14 @@ customElements.define(
       });
     }
 
-    // async addFavHandler() {
-    //   try {
-    //     await UserAPI.addFavHaircut(this.id);
-    //     Toast.show("Haircut added to favourites");
-    //   } catch (err) {
-    //     Toast.show(err, "error");
-    //   }
-    // }
+    async addFavHandler() {
+      try {
+        // await UserAPI.addFavHaircut(this.id);
+        Toast.show("Product added to favourites");
+      } catch (err) {
+        Toast.show(err, "error");
+      }
+    }
 
     render() {
       return html`
